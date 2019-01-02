@@ -38,100 +38,52 @@ function getCharacters(source, callback)
 	local identifier = GetPlayerIdentifiers(source)[1]
 	MySQL.Async.fetchAll('SELECT * FROM `characters` WHERE `identifier` = @identifier', {
 		['@identifier'] = identifier
-	}, function(result)
-		if result[1] and result[2] and result[3] then
+    }, function(result)
+        local data = {
+            identifier		= '',
+            firstname1		= '',
+            lastname1		= '',
+            dateofbirth1	= '',
+            sex1			= '',
+            height1			= '',
+            firstname2		= '',
+            lastname2		= '',
+            dateofbirth2	= '',
+            sex2			= '',
+            height2			= '',
+            firstname3		= '',
+            lastname3		= '',
+            dateofbirth3	= '',
+            sex3			= '',
+            height3			= ''
+        }
 
-			local data = {
-				identifier		= result[1].identifier,
-				firstname1		= result[1].firstname,
-				lastname1		= result[1].lastname,
-				dateofbirth1	= result[1].dateofbirth,
-				sex1			= result[1].sex,
-				height1			= result[1].height,
-				firstname2		= result[2].firstname,
-				lastname2		= result[2].lastname,
-				dateofbirth2	= result[2].dateofbirth,
-				sex2			= result[2].sex,
-				height2			= result[2].height,
-				firstname3		= result[3].firstname,
-				lastname3		= result[3].lastname,
-				dateofbirth3	= result[3].dateofbirth,
-				sex3			= result[3].sex,
-				height3			= result[3].height
-			}
+        if result[1] then
+            data.identifier		= result[1].identifier
+            data.firstname1		= result[1].firstname
+            data.lastname1		= result[1].lastname
+            data.dateofbirth1	= result[1].dateofbirth
+            data.sex1			= result[1].sex
+            data.height1		= result[1].height
+        end
 
-			callback(data)
+		if result[2] then
+            data.firstname2		= result[2].firstname
+            data.lastname2		= result[2].lastname
+            data.dateofbirth2	= result[2].dateofbirth
+            data.sex2			= result[2].sex
+            data.height2		= result[2].height
+        end
 
-		elseif result[1] and result[2] and not result[3] then
+        if result[3] then
+            data.firstname3		= result[3].firstname
+            data.lastname3		= result[3].lastname
+            data.dateofbirth3	= result[3].dateofbirth
+            data.sex3			= result[3].sex
+            data.height3		= result[3].height
+        end
 
-			local data = {
-				identifier		= result[1].identifier,
-				firstname1		= result[1].firstname,
-				lastname1		= result[1].lastname,
-				dateofbirth1	= result[1].dateofbirth,
-				sex1			= result[1].sex,
-				height1			= result[1].height,
-				firstname2		= result[2].firstname,
-				lastname2		= result[2].lastname,
-				dateofbirth2	= result[2].dateofbirth,
-				sex2			= result[2].sex,
-				height2			= result[2].height,
-				firstname3		= '',
-				lastname3		= '',
-				dateofbirth3	= '',
-				sex3			= '',
-				height3			= ''
-			}
-
-			callback(data)
-
-		elseif result[1] and not result[2] and not result[3] then
-
-			local data = {
-				identifier		= result[1].identifier,
-				firstname1		= result[1].firstname,
-				lastname1		= result[1].lastname,
-				dateofbirth1	= result[1].dateofbirth,
-				sex1			= result[1].sex,
-				height1			= result[1].height,
-				firstname2		= '',
-				lastname2		= '',
-				dateofbirth2	= '',
-				sex2			= '',
-				height2			= '',
-				firstname3		= '',
-				lastname3		= '',
-				dateofbirth3	= '',
-				sex3			= '',
-				height3			= ''
-			}
-
-			callback(data)
-
-		else
-
-			local data = {
-				identifier		= '',
-				firstname1		= '',
-				lastname1		= '',
-				dateofbirth1	= '',
-				sex1			= '',
-				height1			= '',
-				firstname2		= '',
-				lastname2		= '',
-				dateofbirth2	= '',
-				sex2			= '',
-				height2			= '',
-				firstname3		= '',
-				lastname3		= '',
-				dateofbirth3	= '',
-				sex3			= '',
-				height3			= ''
-			}
-
-			callback(data)
-
-		end
+		callback(data)
 	end)
 end
 
