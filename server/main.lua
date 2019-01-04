@@ -11,7 +11,7 @@ function getIdentity(source, callback)
 		if result[1].firstname ~= nil then
 			callback({
 				identifier	= result[1].identifier,
-				character = results[1]
+				character = result[1]
 			})
 		else
 			callback({
@@ -39,7 +39,7 @@ function getCharacters(source, callback)
 end
 
 function setIdentity(identifier, data, callback)
-	local params = createParams(identifier, data)
+	local params = createParams(identifier, data.character)
 
 	MySQL.Async.execute(
 		'UPDATE `users` SET `firstname` = @firstname, `lastname` = @lastname, `dateofbirth` = @dateofbirth, `sex` = @sex, `height` = @height WHERE identifier = @identifier',
@@ -84,11 +84,11 @@ end
 function createParams(identifier, character)
 	return {
 		['@identifier']		= identifier,
-		['@firstname']		= data.character.firstname,
-		['@lastname']		= data.character.lastname,
-		['@dateofbirth']	= data.character.dateofbirth,
-		['@sex']			= data.character.sex,
-		['@height']			= data.character.height
+		['@firstname']		= character.firstname,
+		['@lastname']		= character.lastname,
+		['@dateofbirth']	= character.dateofbirth,
+		['@sex']			= character.sex,
+		['@height']			= character.height
 	}
 end
 
@@ -160,10 +160,10 @@ end, {help = "Register a new character"})
 
 TriggerEvent('es:addGroupCommand', 'char', 'user', function(source, args, user)
 	getIdentity(source, function(data)
-		if data.firstname == '' then
+		if data.character.firstname == '' then
 			TriggerClientEvent('chat:addMessage', source, { args = { '^1[IDENTITY]', 'You do not have an active character!' } })
 		else
-			TriggerClientEvent('chat:addMessage', source, { args = { '^1[IDENTITY]', 'Active character: ^2' .. data.firstname .. ' ' .. data.lastname } })
+			TriggerClientEvent('chat:addMessage', source, { args = { '^1[IDENTITY]', 'Active character: ^2' .. data.character.firstname .. ' ' .. data.character.lastname } })
 		end
 	end)
 end, function(source, args, user)
@@ -174,7 +174,7 @@ TriggerEvent('es:addGroupCommand', 'charlist', 'user', function(source, args, us
 	getCharacters(source, function(data)
 		if #data.characters > 0 then
 			for index, character in pairs(data.characters) do
-				TriggerClientEvent('chat:addMessage', source, { args = { '^1[IDENTITY] Character ' .. index .. ':', data.firstname .. ' ' .. data.lastname } })
+				TriggerClientEvent('chat:addMessage', source, { args = { '^1[IDENTITY] Character ' .. index .. ':', character.firstname .. ' ' .. character.lastname } })
 			end
 		else
 			TriggerClientEvent('chat:addMessage', source, { args = { '^[IDENTITY]', 'You have no registered characters. Use the ^3/register^0 command to register a character.' } })
@@ -203,7 +203,7 @@ TriggerEvent('es:addGroupCommand', 'charselect', 'user', function(source, args, 
 
 			updateIdentity(GetPlayerIdentifiers(source)[1], data, function(callback)
 				if callback then
-					TriggerClientEvent('chat:addMessage', source, { args = { '^1[IDENTITY]', 'Updated your active character to ^2' .. data.firstname .. ' ' .. data.lastname } })
+					TriggerClientEvent('chat:addMessage', source, { args = { '^1[IDENTITY]', 'Updated your active character to ^2' .. data.character.firstname .. ' ' .. data.character.lastname } })
 				else
 					TriggerClientEvent('chat:addMessage', source, { args = { '^1[IDENTITY]', 'Failed to update your identity, try again later or contact the server admin!' } })
 				end
@@ -233,7 +233,7 @@ TriggerEvent('es:addGroupCommand', 'chardel', 'user', function(source, args, use
 
 			deleteIdentity(GetPlayerIdentifiers(source)[1], data, function(callback)
 				if callback then
-					TriggerClientEvent('chat:addMessage', source, { args = { '^1[IDENTITY]', 'You have deleted ^1' .. data.firstname .. ' ' .. data.lastname } })
+					TriggerClientEvent('chat:addMessage', source, { args = { '^1[IDENTITY]', 'You have deleted ^1' .. data.character.firstname .. ' ' .. data.character.lastname } })
 				else
 					TriggerClientEvent('chat:addMessage', source, { args = { '^1[IDENTITY]', 'Failed to delete the character, try again later or contact the server admin!' } })
 				end
