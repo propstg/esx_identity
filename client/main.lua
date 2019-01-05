@@ -59,19 +59,19 @@ end)
 RegisterNUICallback('register', function(data, cb)
 	local reason = ""
 	myIdentity = data
-	for theData, value in pairs(myIdentity) do
-		if theData == "firstname" or theData == "lastname" then
+	for fieldName, value in pairs(myIdentity) do
+		if fieldName == "firstname" or fieldName == "lastname" then
 			reason = verifyName(value)
 			
 			if reason ~= "" then
 				break
 			end
-		elseif theData == "dateofbirth" then
+		elseif fieldName == "dateofbirth" then
 			if value == "invalid" then
 				reason = "Invalid date of birth!"
 				break
 			end
-		elseif theData == "height" then
+		elseif fieldName == "height" then
 			local height = tonumber(value)
 			if height then
 				if height > 200 or height < 140 then
@@ -86,7 +86,7 @@ RegisterNUICallback('register', function(data, cb)
 	end
 	
 	if reason == "" then
-		TriggerServerEvent('esx_identity:setIdentity', data, myIdentifiers)
+		TriggerServerEvent('esx_identity:setIdentity', {character = data}, myIdentifiers)
 		EnableGui(false)
 		Citizen.Wait(500)
 		TriggerEvent('esx_skin:openSaveableMenu', myIdentifiers.id)
