@@ -5,7 +5,7 @@ TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 function getIdentity(source, callback)
 	local identifier = GetPlayerIdentifiers(source)[1]
 
-	MySQL.Async.fetchAll('SELECT identifier, firstname, lastname, dateofbirth, sex, height FROM `users` WHERE `identifier` = @identifier', {
+	MySQL.Async.fetchAll('SELECT identifier, firstname, lastname, dateofbirth, sex, height, skin FROM `users` WHERE `identifier` = @identifier', {
 		['@identifier'] = identifier
 	}, function(result)
 		if result[1].firstname ~= nil then
@@ -20,7 +20,8 @@ function getIdentity(source, callback)
 				lastname	= '',
 				dateofbirth	= '',
 				sex			= '',
-				height		= ''
+				height		= '',
+				skin		= nil
 			})
 		end
 	end)
@@ -39,11 +40,16 @@ function getCharacters(source, callback)
 end
 
 function setIdentity(identifier, data, callback)
+	local params = createParams(identifier, data.character)
+
 	MySQL.Async.execute(
-		'INSERT INTO characters (identifier, firstname, lastname, dateofbirth, sex, height) VALUES (@identifier, @firstname, @lastname, @dateofbirth, @sex, @height)', 
-		createParams(identifier, data.character),
+		'INSERT INTO characters (identifier, firstname, lastname, dateofbirth, sex, height, skin) VALUES (@identifier, @firstname, @lastname, @dateofbirth, @sex, @height, @skin)', 
+		params,
 		function(result)
-			updateIdentity(identifier, data, callback)
+			MySQL.Async.fetchAll('SELECT max(id) as insertedId FROM characters WHERE identifier = @identifier', params, function(insertedId)
+				data.character.id = insertedId[1].insertedId
+				updateIdentity(identifier, data, callback)
+			end)
 		end
 	)
 end
@@ -55,7 +61,9 @@ function updateIdentity(identifier, data, callback)
 		'`lastname` = @lastname, ' ..
 		'`dateofbirth` = @dateofbirth, ' ..
 		'`sex` = @sex, ' ..
-		'`height` = @height ' ..
+		'`height` = @height, ' ..
+		'`skin` = @skin, ' ..
+		'`current_character_id` = @characterId ' ..
 		'WHERE identifier = @identifier',
 		createParams(identifier, data.character),
 		function(rowsChanged)
@@ -86,9 +94,21 @@ function createParams(identifier, character)
 		['@dateofbirth']	= character.dateofbirth,
 		['@sex']			= character.sex,
 		['@height']			= character.height,
+		['@skin']			= character.skin,
 		['@characterId']	= character.id
 	}
 end
+
+RegisterServerEvent('esx_skin:save')
+AddEventHandler('esx_skin:save', function(skin)
+	local xPlayer = ESX.GetPlayerFromId(source)
+
+	MySQL.Async.execute('UPDATE characters SET `skin` = @skin WHERE identifier = @identifier AND `id` = (SELECT current_character_id FROM `users` WHERE identifier = @identifier)',
+	{
+		['@skin']		= json.encode(skin),
+		['@identifier'] = xPlayer.identifier
+	})
+end)
 
 RegisterServerEvent('esx_identity:setIdentity')
 AddEventHandler('esx_identity:setIdentity', function(data, myIdentifiers)
@@ -201,6 +221,7 @@ TriggerEvent('es:addGroupCommand', 'charselect', 'user', function(source, args, 
 
 			updateIdentity(GetPlayerIdentifiers(source)[1], data, function(callback)
 				if callback then
+					TriggerClientEvent('skinchanger:loadSkin', source, json.decode(data.character.skin), nil)
 					TriggerClientEvent('chat:addMessage', source, { args = { '^1[IDENTITY]', 'Updated your active character to ^2' .. data.character.firstname .. ' ' .. data.character.lastname } })
 				else
 					TriggerClientEvent('chat:addMessage', source, { args = { '^1[IDENTITY]', 'Failed to update your identity, try again later or contact the server admin!' } })

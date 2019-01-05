@@ -58,7 +58,6 @@ end)
 
 RegisterNUICallback('register', function(data, cb)
 	local reason = ""
-	myIdentity = data
 	for fieldName, value in pairs(myIdentity) do
 		if fieldName == "firstname" or fieldName == "lastname" then
 			reason = verifyName(value)
