@@ -5,7 +5,8 @@ ALTER TABLE `users`
 	ADD COLUMN `lastname` VARCHAR(50) NULL DEFAULT '',
 	ADD COLUMN `dateofbirth` VARCHAR(25) NULL DEFAULT '',
 	ADD COLUMN `sex` VARCHAR(10) NULL DEFAULT '',
-	ADD COLUMN `height` VARCHAR(5) NULL DEFAULT ''
+	ADD COLUMN `height` VARCHAR(5) NULL DEFAULT '',
+	ADD COLUMN `current_character_id` int(11) NULL
 ;
 
 CREATE TABLE `characters` (
@@ -16,6 +17,6 @@ CREATE TABLE `characters` (
 	`dateofbirth` VARCHAR(255) NOT NULL,
 	`sex` VARCHAR(1) NOT NULL DEFAULT 'M',
 	`height` VARCHAR(128) NOT NULL,
-
+	`skin` LONGTEXT NULL,
 	PRIMARY KEY (`id`)
 );

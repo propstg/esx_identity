@@ -262,7 +262,3 @@ TriggerEvent('es:addGroupCommand', 'chardel', 'user', function(source, args, use
 end, function(source, args, user)
 	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM', 'Insufficient permissions!' } })
 end, {help = "Delete a registered character", params = {{name = "char", help = "the character id, ranges from 1-"..Config.MaxCharacters}}})
-<<<<<<< HEAD
-
-=======
->>>>>>> 88818bd3d832a52544322e4f55fd3f01801fa9ea

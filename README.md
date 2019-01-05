@@ -24,7 +24,7 @@ git clone https://github.com/ESX-Org/esx_identity [esx]/esx_identity
 - Put it in the `[esx]` directory
 
 ## Installation
-- Import `esx_identity.sql` in your database
+- Import `esx_identity.sql` in your database (if upgrading, import esx_identity_update.sql instead)
 - Add this to your `server.cfg`:
 
 ```
